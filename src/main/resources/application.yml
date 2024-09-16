@@ -20,3 +20,10 @@ twilio:
 #  level:
 #    root: debug
 #debug: true
+
+jwt:
+  prefix: "Bearer "
+  secret: ENjdcE4uHw1bPs0z2VhdfnVjHKnN5O3wwgN0xQW6MgA
+  expiration-time-in-minutes:
+    access: 60
+    refresh: 7200
