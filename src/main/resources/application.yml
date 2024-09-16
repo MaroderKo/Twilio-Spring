@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: Twilio-Spring
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/twilio
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+twilio:
+  sid: ${TWILIO_SID}
+  auth-token: ${TWILIO_AUTH_TOKEN}
+  phone-number: +17024306447
+
+#logging:
+#  level:
+#    root: debug
+#debug: true
