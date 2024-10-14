@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class BeanConfiguration(
+class TwilioConfiguration(
     @Value("\${twilio.sid}") val twilioSID: String,
     @Value("\${twilio.auth-token}") val twilioToken: String
 

@@ -12,19 +12,26 @@ import kotlin.random.Random
 class F2AServiceImpl(
     val repository: F2ARepository
 ) : F2AService {
-    override fun createRecord(user: User) {
-        return repository.setRecord(user, F2ARecord(code = Random.nextInt(100000, 1000000).toString()))
+    override fun createRecord(sessionId: String, user: User): String {
+        val f2aCode = Random.nextInt(100000, 1000000).toString()
+        repository.setRecord(
+            sessionId,
+            F2ARecord(user = user, code = f2aCode)
+        )
+        return f2aCode
     }
 
-    override fun checkCode(user: User, code: String): Boolean {
-        val record = repository.getRecord(user)
+    override fun checkCode(sessionId: String, code: String): User? {
+        val record = repository.getRecord(sessionId)
         val isCodeRight = record?.checkCode(code) ?: throw F2ARecordNotFoundException()
         if (!isCodeRight) {
             record.wrongCodeCount += 1
             if (record.wrongCodeCount >= 3) {
-                repository.deleteRecord(user)
+                repository.deleteRecord(sessionId)
             }
+        } else {
+            repository.deleteRecord(sessionId)
         }
-        return isCodeRight
+        return record.user
     }
 }

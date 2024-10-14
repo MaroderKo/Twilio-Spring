@@ -1,4 +1,3 @@
 package com.project.twiliospring.exception
 
-class F2ARecordNotFoundException : RuntimeException() {
-}
+class F2ARecordNotFoundException : RuntimeException()

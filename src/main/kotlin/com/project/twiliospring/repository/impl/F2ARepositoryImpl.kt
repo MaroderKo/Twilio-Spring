@@ -1,23 +1,27 @@
 package com.project.twiliospring.repository.impl
 
 import com.project.twiliospring.domain.F2ARecord
-import com.project.twiliospring.domain.User
 import com.project.twiliospring.repository.F2ARepository
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class F2ARepositoryImpl : F2ARepository {
-    val storage = LinkedHashMap<User, F2ARecord>()
-    override fun getRecord(user: User): F2ARecord? {
-        return storage.get(user);
+    val storage = LinkedHashMap<String, F2ARecord>()
+    override fun getRecord(sessionId: String): F2ARecord? {
+        return storage[sessionId]
     }
 
-    override fun setRecord(user: User, record: F2ARecord) {
-        storage.put(user, record);
+    override fun setRecord(sessionId: String, record: F2ARecord) {
+        storage[sessionId] = record
     }
 
-    override fun deleteRecord(user: User) {
-        storage.remove(user);
+    override fun deleteRecord(sessionId: String) {
+        storage.remove(sessionId)
+    }
+
+    override fun clearOldRecords() {
+        storage.entries.removeAll { entry -> entry.value.expirationDate.isBefore(LocalDateTime.now()) }
     }
 
 

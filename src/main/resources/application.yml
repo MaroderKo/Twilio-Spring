@@ -10,15 +10,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.validator.apply_to_ddl: true
 
 twilio:
   sid: ${TWILIO_SID}
   auth-token: ${TWILIO_AUTH_TOKEN}
   phone-number: +17024306447
 
-#logging:
-#  level:
+logging:
+  level:
 #    root: debug
+    org:
+      springframework:
+        security: debug
 #debug: true
 
 jwt:

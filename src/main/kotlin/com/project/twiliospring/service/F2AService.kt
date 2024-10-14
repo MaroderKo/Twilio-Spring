@@ -1,9 +1,8 @@
 package com.project.twiliospring.service
 
-import com.project.twiliospring.domain.F2ARecord
 import com.project.twiliospring.domain.User
 
 interface F2AService {
-    fun createRecord(user: User)
-    fun checkCode(user: User, code: String): Boolean
+    fun createRecord(sessionId: String, user: User): String
+    fun checkCode(sessionId: String, code: String): User?
 }

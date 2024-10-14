@@ -2,9 +2,12 @@ package com.project.twiliospring.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
+import org.springframework.security.core.Authentication
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 
@@ -18,13 +21,26 @@ class SecurityConfiguration {
         http.invoke {
             authorizeRequests {
                 authorize("/", authenticated)
-                authorize("/message", authenticated)
+                authorize("/login/**", permitAll)
+                authorize("/login/code", permitAll)
+                authorize("/logout", permitAll)
+//                authorize("/register", permitAll)
+                authorize("/user", authenticated)
                 authorize(anyRequest, denyAll)
             }
+            csrf { disable() }
+            cors { disable() }
             addFilterAfter<BasicAuthenticationFilter>(jwtFilter)
         }
 
         return http.build()
 
+    }
+
+    @Bean
+    fun noopAuthenticationManager(): AuthenticationManager {
+        return AuthenticationManager { authentication: Authentication? ->
+            throw AuthenticationServiceException("Authentication is disabled")
+        }
     }
 }
