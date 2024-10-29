@@ -24,7 +24,6 @@ class SecurityConfiguration {
                 authorize("/login/**", permitAll)
                 authorize("/login/code", permitAll)
                 authorize("/logout", permitAll)
-//                authorize("/register", permitAll)
                 authorize("/user", authenticated)
                 authorize(anyRequest, denyAll)
             }
@@ -37,9 +36,10 @@ class SecurityConfiguration {
 
     }
 
+    // made spring security not creating user automatically
     @Bean
     fun noopAuthenticationManager(): AuthenticationManager {
-        return AuthenticationManager { authentication: Authentication? ->
+        return AuthenticationManager { _: Authentication? ->
             throw AuthenticationServiceException("Authentication is disabled")
         }
     }

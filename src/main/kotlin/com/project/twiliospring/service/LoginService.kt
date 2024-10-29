@@ -1,11 +1,11 @@
 package com.project.twiliospring.service
 
-import com.project.twiliospring.domain.LoginState
+import com.project.twiliospring.domain.LoginResult
 import com.project.twiliospring.domain.User
 import jakarta.servlet.http.HttpServletResponse
 
 interface LoginService {
-    fun loginByUsernameAndPassword(response: HttpServletResponse, username: String, password: String): LoginState
-    fun loginF2A(response: HttpServletResponse, sessionId: String, code: String): LoginState
+    fun loginByUsernameAndPassword(response: HttpServletResponse, username: String, password: String): LoginResult
+    fun loginF2A(response: HttpServletResponse, sessionId: String, code: String): LoginResult
     fun registerUser(user: User): User
 }

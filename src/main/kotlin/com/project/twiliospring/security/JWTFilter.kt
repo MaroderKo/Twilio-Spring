@@ -32,9 +32,13 @@ class JWTFilter(
                     HTTPUtil.applyNewTokens(response, newTokens)
                     token = newTokens.accessToken
                     authenticated = true
-                } catch (_: UserNotFoundException) {
+                } catch (_: UserNotFoundException){
+                    clearAuthenticationData(response)
                 }
 
+            }
+            else {
+                clearAuthenticationData(response)
             }
         } else {
             authenticated = true
@@ -57,6 +61,13 @@ class JWTFilter(
     private fun refreshTokens(refreshToken: String): UserTokensDTO {
         val user = jwtProvider.getUser(refreshToken)?.copy(password = "") ?: throw UserNotFoundException()
         return jwtProvider.generateTokens(user)
+    }
+
+    private fun clearAuthenticationData(response: HttpServletResponse) {
+        response.addCookie(HTTPUtil.createPublicCookie("Authenticated", "False"))
+        response.addCookie(HTTPUtil.suspendCookie("token"))
+        response.addCookie(HTTPUtil.suspendCookie("refresh-token"))
+        response.addCookie(HTTPUtil.suspendCookie("role", false))
     }
 
 }

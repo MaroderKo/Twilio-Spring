@@ -14,9 +14,9 @@ class TwilioMessengerService(
     @Value("\${twilio.phone-number}") val twilioPhone: String
 ) : MessengerService {
     val logger: Logger = Logger.getLogger(MessengerService::class.java.name)
-    override fun sendMessage(text: String, user: User) {
+    override fun sendMessage(text: String, number: String) {
         val message = Message.creator(
-            PhoneNumber(user.phoneNumber),
+            PhoneNumber(number),
             PhoneNumber(twilioPhone),
             text
         )

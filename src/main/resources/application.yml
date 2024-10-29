@@ -1,6 +1,8 @@
 spring:
   application:
     name: Twilio-Spring
+  profiles:
+    active: twilio
 
   datasource:
     driver-class-name: org.postgresql.Driver

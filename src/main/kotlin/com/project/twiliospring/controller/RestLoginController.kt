@@ -1,6 +1,6 @@
 package com.project.twiliospring.controller
 
-import com.project.twiliospring.domain.LoginState
+import com.project.twiliospring.domain.LoginResult
 import com.project.twiliospring.domain.User
 import com.project.twiliospring.domain.dto.F2aCodeDTO
 import com.project.twiliospring.domain.dto.LoginDTO
@@ -23,11 +23,22 @@ class RestLoginController(
         @RequestBody loginDTO: LoginDTO,
         response: HttpServletResponse
     ): ResponseEntity<Any> {
-        val loginStatus = loginService.loginByUsernameAndPassword(response, loginDTO.username, loginDTO.password)
-        if (loginStatus == LoginState.NOT_AUTHENTICATED) {
-            return ResponseEntity.status(loginStatus.getResponseStatus()).body("Username or password is incorrect")
+        val loginResult = loginService.loginByUsernameAndPassword(response, loginDTO.username, loginDTO.password)
+        return when (loginResult)
+        {
+            is LoginResult.NotAuthenticated -> {
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or password is incorrect")
+            }
+
+            is LoginResult.Authenticated -> {
+                HTTPUtil.applyNewTokens(response, loginResult.tokens)
+                response.addCookie(HTTPUtil.createPublicCookie("Authenticated", true.toString()))
+                ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username or password is incorrect")
+            }
+            is LoginResult.F2ACodePending -> {
+                ResponseEntity.status(HttpStatus.ACCEPTED).body(loginResult.sessionId)
+            }
         }
-        return ResponseEntity.status(loginStatus.getResponseStatus()).build()
     }
 
     @PostMapping("/code")
@@ -36,13 +47,24 @@ class RestLoginController(
         @RequestBody f2aCodeDTO: F2aCodeDTO,
         response: HttpServletResponse
     ): ResponseEntity<Any> {
-        val sessionId = request.cookies.find { it.name == "SESSION_ID" }?.value!!
-        val loginStatus = loginService.loginF2A(response, sessionId, f2aCodeDTO.code)
+        val sessionId = request.getHeader("X-SessionId")!!
+        val loginResult = loginService.loginF2A(response, sessionId, f2aCodeDTO.code)
+        return when (loginResult)
+        {
+            is LoginResult.Authenticated -> {
+                response.addCookie(HTTPUtil.createPublicCookie("Authenticated", true.toString()))
+                HTTPUtil.applyNewTokens(response, loginResult.tokens)
+                ResponseEntity.ok().build()
+            }
 
-        if (loginStatus == LoginState.NOT_AUTHENTICATED) {
-            return ResponseEntity.status(loginStatus.getResponseStatus()).body("2FA code is incorrect")
+            is LoginResult.NotAuthenticated -> {
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("2FA code is incorrect")
+            }
+
+            else -> {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+            }
         }
-        return ResponseEntity.status(loginStatus.getResponseStatus()).build()
     }
 
     @PostMapping("/register")

@@ -1,6 +1,6 @@
 package com.project.twiliospring.service.impl
 
-import com.project.twiliospring.domain.LoginState
+import com.project.twiliospring.domain.LoginResult
 import com.project.twiliospring.domain.User
 import com.project.twiliospring.security.JWTProvider
 import com.project.twiliospring.service.F2AService
@@ -17,46 +17,47 @@ class LoginServiceImpl(
     var jwtProvider: JWTProvider,
     var userService: UserService,
     var f2aService: F2AService,
-    var messengerService: MessengerService
+    var messengerService: MessengerService,
 ) : LoginService {
     override fun loginByUsernameAndPassword(
         response: HttpServletResponse,
         username: String,
         password: String
-    ): LoginState {
+    ): LoginResult {
         val user =
-            userService.findByUsernameAndPassword(username, password) ?: return LoginState.NOT_AUTHENTICATED
+            userService.findByUsernameAndPassword(username, password) ?: return LoginResult.NotAuthenticated
         if (user.phoneNumber.isNullOrEmpty()) {
             val userTokens = jwtProvider.generateTokens(user)
             HTTPUtil.applyNewTokens(response, userTokens)
-            response.addCookie(HTTPUtil.createPublicCookie("Authenticated", "True"))
-            return LoginState.AUTHENTICATED
+            return LoginResult.Authenticated(userTokens)
         }
-        val sessionId = UUID.randomUUID().toString()
-        val code = f2aService.createRecord(sessionId, user)
-        messengerService.sendMessage("2FA login code: $code", user)
-//        println("\nf2a code: $code\n")
-//        println("Session ID: $sessionId")
-        response.addCookie(HTTPUtil.createSecuredCookie("SESSION_ID", sessionId))
-        response.addCookie(HTTPUtil.createPublicCookie("Authenticated", "False"))
-        return LoginState.F2A_CODE_PENDING
+        val sessionId = user.id.toString()
+        f2aService.createRecord(user.phoneNumber)
+        return LoginResult.F2ACodePending(encodeSessionId(sessionId))
     }
 
-    override fun loginF2A(response: HttpServletResponse, sessionId: String, code: String): LoginState {
-        val user = f2aService.checkCode(sessionId, code.trim())
-        if (user != null) {
+    override fun loginF2A(response: HttpServletResponse, sessionId: String, code: String): LoginResult {
+        val decodedSessionId = decodeSessionId(sessionId)
+        val user = userService.findById(decodedSessionId.toLong())
+        if (f2aService.checkCode(user?.phoneNumber!!, code.trim())) {
             val userTokens = jwtProvider.generateTokens(user)
-            HTTPUtil.applyNewTokens(response, userTokens)
-            response.addCookie(HTTPUtil.suspendCookie("SESSION_ID"))
-            response.addCookie(HTTPUtil.createPublicCookie("Authenticated", "True"))
-            return LoginState.AUTHENTICATED
-        } else {
-            return LoginState.NOT_AUTHENTICATED
+            return LoginResult.Authenticated(userTokens)
         }
+        return LoginResult.NotAuthenticated
     }
 
     override fun registerUser(user: User): User {
         val registeredUser = userService.save(user)
         return registeredUser
     }
+
+    private fun encodeSessionId(sessionId: String): String {
+        return Base64.getEncoder().encodeToString(sessionId.toByteArray())
+    }
+
+    private fun decodeSessionId(sessionId: String): String {
+        return String(Base64.getDecoder().decode(sessionId))
+    }
+
+
 }
