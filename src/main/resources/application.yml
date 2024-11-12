@@ -1,9 +1,11 @@
 spring:
   application:
     name: Twilio-Spring
-  profiles:
-    active: twilio
-
+  #  profiles:
+  #    active: twilio
+  data:
+    redis:
+      host: localhost
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/twilio

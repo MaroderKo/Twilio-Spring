@@ -1,6 +1,5 @@
 package com.project.twiliospring.service.impl
 
-import com.project.twiliospring.domain.User
 import com.project.twiliospring.service.MessengerService
 import com.twilio.rest.api.v2010.account.Message
 import com.twilio.type.PhoneNumber

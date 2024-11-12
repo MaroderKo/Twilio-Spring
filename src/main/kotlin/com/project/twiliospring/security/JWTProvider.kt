@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit
 class JWTProvider(
     val userService: UserService,
     @Value("\${jwt.secret}") val secretKey: String,
-    @Value("\${jwt.expiration-time-in-minutes.access}") val accessTokenExpirationTime: Long? = null,
-    @Value("\${jwt.expiration-time-in-minutes.refresh}") val refreshTokenExpirationTime: Long? = null,
+    @Value("\${jwt.expiration-time-in-minutes.access}") val accessTokenExpirationTime: Long,
+    @Value("\${jwt.expiration-time-in-minutes.refresh}") val refreshTokenExpirationTime: Long,
     @Value("\${jwt.prefix}") val tokenPrefix: String? = null
 ) {
 
@@ -40,9 +40,17 @@ class JWTProvider(
             .subject(user.username)
             .and()
             .issuedAt(Date(System.currentTimeMillis()))
-            .expiration(Date(Date().time + TimeUnit.MINUTES.toMillis((if (isRefreshToken) refreshTokenExpirationTime else accessTokenExpirationTime)!!)))
+            .expiration(getExpirationDate(isRefreshToken))
             .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
             .compact()
+    }
+
+    private fun getExpirationDate(isRefreshToken: Boolean): Date {
+        return if (isRefreshToken) {
+            Date(Date().time + TimeUnit.MINUTES.toMillis(refreshTokenExpirationTime))
+        } else {
+            Date(Date().time + TimeUnit.MINUTES.toMillis(accessTokenExpirationTime))
+        }
     }
 
     fun isTokenValid(token: String): Boolean {

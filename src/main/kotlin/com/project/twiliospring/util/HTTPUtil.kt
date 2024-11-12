@@ -11,6 +11,7 @@ class HTTPUtil {
                 isHttpOnly = true
                 maxAge = -1
                 path = "/"
+                setAttribute("SameSite", "Strict")
             }
         }
 
@@ -19,6 +20,7 @@ class HTTPUtil {
                 path = "/"
                 isHttpOnly = secured
                 maxAge = 0
+                setAttribute("SameSite", "Strict")
             }
         }
 
@@ -26,6 +28,7 @@ class HTTPUtil {
             return Cookie(name, value).apply {
                 maxAge = -1
                 path = "/"
+                setAttribute("SameSite", "Strict")
             }
         }
 
