@@ -1,6 +1,5 @@
 package com.project.twiliospring.service.impl
 
-import com.project.twiliospring.domain.User
 import com.project.twiliospring.service.MessengerService
 import com.twilio.rest.api.v2010.account.Message
 import com.twilio.type.PhoneNumber
@@ -14,9 +13,9 @@ class TwilioMessengerService(
     @Value("\${twilio.phone-number}") val twilioPhone: String
 ) : MessengerService {
     val logger: Logger = Logger.getLogger(MessengerService::class.java.name)
-    override fun sendMessage(text: String, user: User) {
+    override fun sendMessage(text: String, number: String) {
         val message = Message.creator(
-            PhoneNumber(user.phoneNumber),
+            PhoneNumber(number),
             PhoneNumber(twilioPhone),
             text
         )

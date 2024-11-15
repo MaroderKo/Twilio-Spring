@@ -13,3 +13,8 @@ services:
       - POSTGRES_DB=twilio
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+  redis:
+    image: 'redis:7.0.10-alpine'
+    container_name: redis
+    ports:
+      - '6379:6379'

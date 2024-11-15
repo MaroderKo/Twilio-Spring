@@ -1,7 +1,11 @@
 spring:
   application:
     name: Twilio-Spring
-
+  #  profiles:
+  #    active: twilio
+  data:
+    redis:
+      host: localhost
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/twilio
@@ -10,13 +14,26 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.validator.apply_to_ddl: true
 
 twilio:
   sid: ${TWILIO_SID}
   auth-token: ${TWILIO_AUTH_TOKEN}
   phone-number: +17024306447
 
-#logging:
-#  level:
+logging:
+  level:
 #    root: debug
+    org:
+      springframework:
+        security: debug
 #debug: true
+
+jwt:
+  prefix: "Bearer "
+  secret: ENjdcE4uHw1bPs0z2VhdfnVjHKnN5O3wwgN0xQW6MgA
+  expiration-time-in-minutes:
+    access: 60
+    refresh: 7200
