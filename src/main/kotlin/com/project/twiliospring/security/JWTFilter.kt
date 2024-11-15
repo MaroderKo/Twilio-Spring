@@ -23,10 +23,10 @@ class JWTFilter(
     ) {
         logger.debug("Request to ${request.method} ${request.requestURI}{}")
 
-        val (token, authenticated) = checkTokens(request, response)
+        val token = checkTokens(request, response)
 
-        if (authenticated) {
-            authenticateUserByToken(token!!)
+        if (token != null) {
+            authenticateUserByToken(token)
             response.addCookie(HTTPUtil.createPublicCookie("Authenticated", "True"))
         } else {
             response.addCookie(HTTPUtil.createPublicCookie("Authenticated", "False"))
@@ -35,31 +35,39 @@ class JWTFilter(
         filterChain.doFilter(request, response)
     }
 
+    /**
+     * This class check tokens that client pass with request.
+     * If  tokens is outdated and can be updated - this method will update them and pass to {@link jakarta.servlet.http.HttpServletResponse}
+     *
+     * @param request HttpServletRequest, that can contain user tokens
+     * @param response HttpServletResponse, where necessary, updated tokens can be placed
+     * @return user token if user is authenticated
+     */
     private fun checkTokens(
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): Pair<String?, Boolean> {
+    ): String? {
         var token = request.cookies?.firstOrNull { it.name == "token" }?.value
         val refreshToken = request.cookies?.firstOrNull { it.name == "refresh-token" }?.value
 
-        if (!isTokenValid(token)) {
+        if (token != null && !isTokenValid(token)) {
             // Перевірка refresh-токену, якщо основний токен недійсний
-            if (isTokenValid(refreshToken)) {
+            if (refreshToken != null && isTokenValid(refreshToken)) {
                 try {
-                    val newTokens: UserTokensDTO = refreshTokens(refreshToken!!)
+                    val newTokens: UserTokensDTO = refreshTokens(refreshToken)
                     HTTPUtil.applyNewTokens(response, newTokens)
                     token = newTokens.accessToken
-                    return Pair(token, true)
+                    return token
                 } catch (_: UserNotFoundException) {
                     clearAuthenticationData(response)
-                    return Pair(null, false)
+                    return null
                 }
             } else {
                 clearAuthenticationData(response)
-                return Pair(null, false)
+                return null
             }
         } else {
-            return Pair(token, true)
+            return token
         }
     }
 
@@ -73,8 +81,8 @@ class JWTFilter(
         }
     }
 
-    private fun isTokenValid(token: String?): Boolean {
-        return token != null && jwtProvider.isTokenValid(token)
+    private fun isTokenValid(token: String): Boolean {
+        return jwtProvider.isTokenValid(token)
     }
 
     private fun refreshTokens(refreshToken: String): UserTokensDTO {

@@ -15,10 +15,10 @@ class HTTPUtil {
             }
         }
 
-        fun suspendCookie(name: String, secured: Boolean = true): Cookie {
+        fun suspendCookie(name: String, isSecured: Boolean = true): Cookie {
             return Cookie(name, "null").apply {
                 path = "/"
-                isHttpOnly = secured
+                isHttpOnly = isSecured
                 maxAge = 0
                 setAttribute("SameSite", "Strict")
             }
