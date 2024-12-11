@@ -9,6 +9,7 @@ import com.project.twiliospring.security.JWTProvider
 import com.project.twiliospring.service.F2AService
 import com.project.twiliospring.service.LoginService
 import com.project.twiliospring.service.UserService
+import com.project.twiliospring.util.FeatureSwitcher
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Service
 import java.util.*
@@ -17,7 +18,7 @@ import java.util.*
 class LoginServiceImpl(
     var jwtProvider: JWTProvider,
     var userService: UserService,
-    var f2aService: F2AService,
+    var f2aService: FeatureSwitcher<F2AService>,
 ) : LoginService {
     override fun loginByUsernameAndPassword(
         response: HttpServletResponse,
@@ -31,14 +32,14 @@ class LoginServiceImpl(
             return LoginResult.Authenticated(userTokens)
         }
         val sessionId = user.id.toString()
-        f2aService.createRecord(user.phoneNumber)
+        f2aService.getInstance().createRecord(user.phoneNumber)
         return LoginResult.F2ACodePending(encodeSessionId(sessionId))
     }
 
     override fun loginF2A(response: HttpServletResponse, sessionId: String, code: String): UserTokensDTO {
         val decodedSessionId = decodeSessionId(sessionId)
         val user = userService.findById(decodedSessionId)
-        val isCodeValid = user?.phoneNumber?.let { f2aService.isCodeValid(it, code.trim()) }
+        val isCodeValid = user?.phoneNumber?.let { f2aService.getInstance().isCodeValid(it, code.trim()) }
         return if (isCodeValid == true) {
             jwtProvider.generateTokens(user)
         } else {

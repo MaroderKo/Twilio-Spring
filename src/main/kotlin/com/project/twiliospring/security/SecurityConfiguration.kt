@@ -25,6 +25,7 @@ class SecurityConfiguration {
                 authorize("/login/code", permitAll)
                 authorize("/logout", permitAll)
                 authorize("/user", authenticated)
+                authorize("/feature/**", authenticated)
                 authorize(anyRequest, denyAll)
             }
             csrf { disable() }

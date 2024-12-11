@@ -4,13 +4,18 @@ import com.project.twiliospring.service.F2AService
 import com.twilio.rest.verify.v2.Service
 import com.twilio.rest.verify.v2.service.Verification
 import com.twilio.rest.verify.v2.service.VerificationCheck
-import org.springframework.context.annotation.Profile
+import jakarta.annotation.PreDestroy
 
-@Profile("twilio")
 @org.springframework.stereotype.Service
 class TwilioF2AServiceImpl(
     private val verificationService: Service = Service.creator("Dex verification service").create(),
 ) : F2AService {
+
+    @PreDestroy
+    protected fun serviceRemover() {
+        Service.deleter(verificationService.sid).delete()
+    }
+
     override fun createRecord(number: String) {
         Verification.creator(verificationService.sid, number, "whatsapp").create()
     }
