@@ -1,4 +1,4 @@
-package com.project.twiliospring.util
+package com.project.twiliospring.domain
 
 import java.util.logging.Logger
 

@@ -1,7 +1,7 @@
 package com.project.twiliospring.service.impl
 
 import com.project.twiliospring.exception.FeatureNotFoundException
-import com.project.twiliospring.util.FeatureSwitcher
+import com.project.twiliospring.domain.FeatureSwitcher
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

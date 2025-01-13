@@ -1,6 +1,6 @@
 package com.project.twiliospring.service
 
-import com.project.twiliospring.util.FeatureSwitcher
+import com.project.twiliospring.domain.FeatureSwitcher
 
 interface FeatureService {
     fun getAll(): Map<String, Boolean>

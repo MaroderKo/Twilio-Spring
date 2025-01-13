@@ -9,7 +9,7 @@ import com.project.twiliospring.security.JWTProvider
 import com.project.twiliospring.service.F2AService
 import com.project.twiliospring.service.LoginService
 import com.project.twiliospring.service.UserService
-import com.project.twiliospring.util.FeatureSwitcher
+import com.project.twiliospring.domain.FeatureSwitcher
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Service
 import java.util.*

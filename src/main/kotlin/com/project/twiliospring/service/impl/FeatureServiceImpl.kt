@@ -2,7 +2,7 @@ package com.project.twiliospring.service.impl
 
 import com.project.twiliospring.exception.FeatureNotFoundException
 import com.project.twiliospring.service.FeatureService
-import com.project.twiliospring.util.FeatureSwitcher
+import com.project.twiliospring.domain.FeatureSwitcher
 import org.springframework.stereotype.Service
 
 @Service
