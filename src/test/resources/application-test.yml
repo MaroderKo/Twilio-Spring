@@ -17,9 +17,6 @@ spring:
     init:
       platform: h2
 
-twilio:
-  sid: AC2a38a7b21f80e04e5266d4cbbe5057b0
-  auth-token: AC2a38a7b21f80e04e5266d4cbbe5057b0
 logging:
   level:
     org:
