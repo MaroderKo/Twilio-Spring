@@ -17,5 +17,5 @@ class UserServiceImpl(
     override fun findByEmail(email: String): User? = userRepository.findByEmail(email)
     override fun save(user: User): User = userRepository.save(user)
     override fun update(user: User): User = userRepository.save(user)
-    override fun delete(user: User): User = userRepository.save(user)
+    override fun delete(user: User) = userRepository.delete(user)
 }

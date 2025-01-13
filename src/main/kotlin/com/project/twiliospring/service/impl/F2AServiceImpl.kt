@@ -5,12 +5,10 @@ import com.project.twiliospring.exception.F2ARecordNotFoundException
 import com.project.twiliospring.repository.F2ARepository
 import com.project.twiliospring.service.F2AService
 import com.project.twiliospring.service.MessengerService
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import kotlin.random.Random
 
 @Service
-@Profile("!twilio")
 class F2AServiceImpl(
     val repository: F2ARepository,
     val messengerService: MessengerService

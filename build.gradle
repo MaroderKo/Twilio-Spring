@@ -46,6 +46,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'com.h2database:h2'
     testImplementation 'org.apache.httpcomponents.client5:httpclient5:'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:5.4.0'
 
 
 }
@@ -58,5 +59,6 @@ kotlin {
 }
 
 tasks.named('test') {
+    environment("spring.profiles.active", "test")
     useJUnitPlatform()
 }
